@@ -1,5 +1,7 @@
+
 class Validators {
   static final RegExp _emailPattern = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
+
 
   static String? name(String? value) {
     final text = (value ?? '').trim();
@@ -37,4 +39,13 @@ class Validators {
     }
     return null;
   }
+
+  static String? taskResponsible(String? value) {
+    final text = (value ?? '').trim();
+    if (text.isEmpty) return 'Informe um responsável pela tarefa.';
+    if (text.length < 2) return 'Use pelo menos 2 caracteres.';
+    if (text.length > 80) return 'Use no máximo 80 caracteres.';
+    return null;
+  }
+
 }

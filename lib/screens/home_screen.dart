@@ -124,7 +124,8 @@ class _HomeScreenState extends State<HomeScreen> {
       };
       final matchesSearch = query.isEmpty ||
           task.title.toLowerCase().contains(query) ||
-          task.description.toLowerCase().contains(query);
+          task.description.toLowerCase().contains(query) ||
+          task.responsible.toLowerCase().contains(query);
       return matchesFilter && matchesSearch;
     }).toList();
 

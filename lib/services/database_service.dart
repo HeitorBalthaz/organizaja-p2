@@ -18,7 +18,7 @@ class DatabaseService {
     return factory.openDatabase(
       dbPath,
       options: OpenDatabaseOptions(
-        version: 1,
+        version: 2,
         onConfigure: (db) async {
           await db.execute('PRAGMA foreign_keys = ON');
         },
@@ -39,6 +39,7 @@ class DatabaseService {
             user_id INTEGER NOT NULL,
             title TEXT NOT NULL,
             description TEXT NOT NULL DEFAULT '',
+            responsible TEXT NOT NULL DEFAULT '',
             completed INTEGER NOT NULL DEFAULT 0,
             priority INTEGER NOT NULL DEFAULT 2,
             due_date TEXT,
@@ -49,6 +50,21 @@ class DatabaseService {
           await db.execute(
             'CREATE INDEX idx_tasks_user ON tasks(user_id, completed, due_date)',
           );
+        },
+        onUpgrade: (db, oldVersion, newVersion) async {
+          if (oldVersion < 2) {
+            // Algumas instalações da v1 já criaram a coluna, mas outras não.
+            // Consultamos o esquema para evitar erro de coluna duplicada.
+            final columns = await db.rawQuery('PRAGMA table_info(tasks)');
+            final hasResponsible = columns.any(
+              (column) => column['name'] == 'responsible',
+            );
+            if (!hasResponsible) {
+              await db.execute(
+                "ALTER TABLE tasks ADD COLUMN responsible TEXT NOT NULL DEFAULT ''",
+              );
+            }
+          }
         },
       ),
     );

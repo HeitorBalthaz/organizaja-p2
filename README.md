@@ -15,7 +15,7 @@ O projeto foi desenvolvido para a P2, utilizando Flutter na interface e SQLite n
 - **Login e logout:** acesso às tarefas após autenticação e opção de encerrar a sessão.
 - **Gerenciamento de tarefas (CRUD):** cadastrar, visualizar, editar e excluir tarefas.
 - **Conclusão de tarefas:** marcar uma tarefa como concluída ou pendente.
-- **Organização:** definir prioridade (baixa, média ou alta), descrição e data de vencimento.
+- **Organização:** definir responsável, prioridade (baixa, média ou alta), descrição e data de vencimento.
 - **Busca e filtros:** localizar tarefas por texto e visualizar tarefas pendentes ou concluídas.
 - **Indicadores:** acompanhar a quantidade de tarefas e o progresso da lista.
 - **Persistência local:** manter contas e tarefas salvas mesmo após fechar o aplicativo, desde que os dados locais não sejam apagados.
@@ -115,9 +115,11 @@ O banco de dados chama-se **`organizaja.db`** e é criado automaticamente na pri
 | Tabela | Dados armazenados |
 | --- | --- |
 | **`users`** | Identificador do usuário, nome, e-mail, hash da senha, salt e data de cadastro. |
-| **`tasks`** | Identificador da tarefa, usuário responsável, título, descrição, status de conclusão, prioridade, vencimento e data de criação. |
+| **`tasks`** | Identificador da tarefa, usuário proprietário (`user_id`), nome do responsável (`responsible`), título, descrição, status de conclusão, prioridade, vencimento e data de criação. |
 
 Cada tarefa possui um campo `user_id`, que identifica a conta à qual ela pertence. As consultas e alterações consideram esse identificador para manter as listas separadas.
+
+O campo `responsible` é preenchido no formulário e exibido no card. O banco está na **versão 2**; instalações anteriores recebem a nova coluna automaticamente, sem excluir contas ou tarefas existentes.
 
 No **Android**, o banco fica no armazenamento local do aplicativo. No **Chrome**, a implementação utiliza SQLite em WebAssembly, com persistência no **IndexedDB** do navegador. Os dados não são compartilhados automaticamente entre os dois ambientes.
 

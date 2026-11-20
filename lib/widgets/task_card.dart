@@ -78,6 +78,21 @@ class TaskCard extends StatelessWidget {
                       ),
                     ),
                   ],
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.person_outline, size: 17),
+                      const SizedBox(width: 5),
+                      Expanded(
+                        child: Text(
+                          'Responsável: ${task.responsible.isEmpty ? 'Não informado' : task.responsible}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 10),
                   Wrap(
                     spacing: 9,

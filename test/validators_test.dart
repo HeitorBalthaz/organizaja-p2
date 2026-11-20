@@ -17,5 +17,12 @@ void main() {
       expect(Validators.taskTitle('ab'), isNotNull);
       expect(Validators.taskTitle('Estudar Flutter'), isNull);
     });
+
+    test('valida o nome do responsável', () {
+      expect(Validators.taskResponsible(''), isNotNull);
+      expect(Validators.taskResponsible('A'), isNotNull);
+      expect(Validators.taskResponsible('Ana'), isNull);
+      expect(Validators.taskResponsible('Heitor'), isNull);
+    });
   });
 }

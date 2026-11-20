@@ -24,6 +24,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _title;
   late final TextEditingController _description;
+  late final TextEditingController _responsible;
   late int _priority;
   DateTime? _dueDate;
   bool _busy = false;
@@ -32,7 +33,12 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
   void initState() {
     super.initState();
     _title = TextEditingController(text: widget.existing?.title ?? '');
-    _description = TextEditingController(text: widget.existing?.description ?? '');
+    _description = TextEditingController(
+      text: widget.existing?.description ?? '',
+    );
+    _responsible = TextEditingController(
+      text: widget.existing?.responsible ?? '',
+    );
     _priority = widget.existing?.priority ?? 2;
     _dueDate = widget.existing?.dueDate;
   }
@@ -41,6 +47,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
   void dispose() {
     _title.dispose();
     _description.dispose();
+    _responsible.dispose();
     super.dispose();
   }
 
@@ -64,9 +71,9 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
     if (!_formKey.currentState!.validate() || _busy) return;
     final user = widget.session.user;
     if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Faça login novamente.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Faça login novamente.')));
       return;
     }
     setState(() => _busy = true);
@@ -76,6 +83,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
       userId: user.id,
       title: _title.text.trim(),
       description: _description.text.trim(),
+      responsible: _responsible.text.trim(),
       completed: existing?.completed ?? false,
       priority: _priority,
       dueDate: _dueDate,
@@ -91,9 +99,9 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
       if (mounted) Navigator.of(context).pop(true);
     } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erro ao salvar tarefa.')),
-      );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Erro ao salvar tarefa.')));
       }
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -117,10 +125,11 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      edit ? 'Atualize os detalhes' : 'O que você precisa fazer?',
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.w800,
-                          ),
+                      edit
+                          ? 'Atualize os detalhes'
+                          : 'O que você precisa fazer?',
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.w800),
                     ),
                     const SizedBox(height: 20),
                     TextFormField(
@@ -133,6 +142,19 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                       decoration: const InputDecoration(
                         labelText: 'Título da tarefa',
                         prefixIcon: Icon(Icons.title),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    TextFormField(
+                      controller: _responsible,
+                      enabled: !_busy,
+                      textCapitalization: TextCapitalization.sentences,
+                      maxLength: 80,
+                      textInputAction: TextInputAction.next,
+                      validator: Validators.taskResponsible,
+                      decoration: const InputDecoration(
+                        labelText: 'Responsável pela Tarefa',
+                        prefixIcon: Icon(Icons.person),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -152,16 +174,21 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                     DropdownButtonFormField<int>(
                       initialValue: _priority,
                       decoration: const InputDecoration(
-                        labelText: 'Prioridade', prefixIcon: Icon(Icons.flag_outlined),
+                        labelText: 'Prioridade',
+                        prefixIcon: Icon(Icons.flag_outlined),
                       ),
                       items: const [
                         DropdownMenuItem(value: 1, child: Text('Baixa')),
                         DropdownMenuItem(value: 2, child: Text('Média')),
                         DropdownMenuItem(value: 3, child: Text('Alta')),
                       ],
-                      onChanged: _busy ? null : (value) {
-                        if (value != null) setState(() => _priority = value);
-                      },
+                      onChanged: _busy
+                          ? null
+                          : (value) {
+                              if (value != null)
+                                // ignore: curly_braces_in_flow_control_structures
+                                setState(() => _priority = value);
+                            },
                     ),
                     const SizedBox(height: 18),
                     Card(
@@ -172,14 +199,18 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                             const Icon(Icons.calendar_today_outlined),
                             const SizedBox(width: 12),
                             Expanded(
-                              child: Text(_dueDate == null
-                                  ? 'Sem data de vencimento'
-                                  : 'Prazo: ${_date(_dueDate!)}'),
+                              child: Text(
+                                _dueDate == null
+                                    ? 'Sem data de vencimento'
+                                    : 'Prazo: ${_date(_dueDate!)}',
+                              ),
                             ),
                             if (_dueDate != null)
                               IconButton(
                                 tooltip: 'Remover prazo',
-                                onPressed: _busy ? null : () => setState(() => _dueDate = null),
+                                onPressed: _busy
+                                    ? null
+                                    : () => setState(() => _dueDate = null),
                                 icon: const Icon(Icons.close),
                               ),
                             TextButton(
@@ -197,9 +228,13 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 17),
                       ),
                       icon: const Icon(Icons.save_outlined),
-                      label: Text(_busy
-                          ? 'Salvando...'
-                          : edit ? 'Salvar alterações' : 'Criar tarefa'),
+                      label: Text(
+                        _busy
+                            ? 'Salvando...'
+                            : edit
+                            ? 'Salvar alterações'
+                            : 'Criar tarefa',
+                      ),
                     ),
                   ],
                 ),
